@@ -1,0 +1,30 @@
+---
+- name: Update apt repository and install required packages
+  apt:
+    update_cache: yes
+    name:
+      - zip
+    state: present
+  become: true
+
+- name: Download AWS CLI v2 zip
+  ansible.builtin.get_url:
+    url: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+    dest: "/tmp/awscliv2.zip"
+    mode: '0644'
+
+- name: Unzip the AWS CLI installer
+  ansible.builtin.unarchive:
+    src: "/tmp/awscliv2.zip"
+    dest: "/tmp/"
+    remote_src: yes
+
+- name: Install AWS CLI v2
+  ansible.builtin.command:
+    cmd: "./install"
+    chdir: "/tmp/aws"
+  become: true
+
+- name: Run AWS CLI help command
+  ansible.builtin.command:
+    cmd: "aws --version"
