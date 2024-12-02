@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  roles:
+    - install-aws-cli
+    - install-terraform
+    - repo-folder-symlink
+    - git-configuration
+    - bash-aliases

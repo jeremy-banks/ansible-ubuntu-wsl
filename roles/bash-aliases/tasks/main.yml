@@ -1,0 +1,32 @@
+---
+- name: Add gits alias to .bashrc
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    line: "alias gits='git status'"
+    create: yes
+    state: present
+    regexp: '^alias gits'
+
+- name: Add tnit alias to .bashrc
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    line: "alias tnit='terraform init'"
+    create: yes
+    state: present
+    regexp: '^alias tnit'
+
+- name: Add tplan alias to .bashrc
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    line: "alias tplan='terraform plan -out tfplan && rm tfplan'"
+    create: yes
+    state: present
+    regexp: '^alias tplan'
+
+- name: Add tply alias to .bashrc
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    line: "alias tply='terraform apply -auto-approve'"
+    create: yes
+    state: present
+    regexp: '^alias tply'
