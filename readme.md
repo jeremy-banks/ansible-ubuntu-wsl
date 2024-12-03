@@ -19,9 +19,9 @@ Playbook to reconfigure Ubuntu WSL on Windows quickly
    ```
    sudo -i
    apt update
-   sudo apt install software-properties-common
-   sudo add-apt-repository --yes --update ppa:ansible/ansible
-   sudo apt install -y ansible
+   apt install software-properties-common
+   add-apt-repository --yes --update ppa:ansible/ansible
+   apt install -y ansible
    exit
    ```
 1. Clone this repo and execute playbook
