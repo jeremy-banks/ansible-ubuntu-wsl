@@ -2,9 +2,10 @@
 - hosts: localhost
   roles:
     - install-aws-cli
-    - install-terraform
     - install-eksctl
+    - install-helm
     - install-kubectl
+    - install-terraform
     - repo-folder-symlink
     - git-configuration
     - bash-aliases
