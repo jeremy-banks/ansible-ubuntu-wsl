@@ -1,0 +1,40 @@
+- name: check if helm is installed
+  command: helm version
+  register: helm_check
+  changed_when: false
+  failed_when: false
+
+- name: Add Helm GPG key
+  ansible.builtin.shell: "curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | tee /usr/share/keyrings/helm.gpg > /dev/null"
+  args:
+    creates: /usr/share/keyrings/helm.gpg
+  become: true
+  when: helm_check.rc != 0
+
+- name: Install apt-transport-https
+  ansible.builtin.apt:
+    name: apt-transport-https
+    state: present
+  become: true
+  when: helm_check.rc != 0
+
+- name: Add Helm repository to sources list
+  ansible.builtin.shell: |
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list
+  args:
+    creates: /etc/apt/sources.list.d/helm-stable-debian.list
+  become: true
+  when: helm_check.rc != 0
+
+- name: Update apt package index
+  ansible.builtin.apt:
+    update_cache: yes
+  become: true
+  when: helm_check.rc != 0
+
+- name: Install Helm
+  ansible.builtin.apt:
+    name: helm
+    state: present
+  become: true
+  when: helm_check.rc != 0

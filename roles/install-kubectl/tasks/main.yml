@@ -1,0 +1,52 @@
+---
+- name: check if kubectl is installed
+  command: kubectl version
+  register: kubectl_check
+  changed_when: false
+  failed_when: false
+
+- name: Download kubectl binary
+  ansible.builtin.get_url:
+    url: "https://s3.us-west-2.amazonaws.com/amazon-eks/1.31.2/2024-11-15/bin/linux/amd64/kubectl"
+    dest: "/tmp/kubectl"
+  when: kubectl_check.rc != 0
+
+- name: Download kubectl SHA256 checksum file
+  ansible.builtin.get_url:
+    url: "https://s3.us-west-2.amazonaws.com/amazon-eks/1.31.2/2024-11-15/bin/linux/amd64/kubectl.sha256"
+    dest: "/tmp/kubectl.sha256"
+  when: kubectl_check.rc != 0
+
+- name: Verify kubectl checksum
+  ansible.builtin.shell: "sha256sum -c /tmp/kubectl.sha256"
+  args:
+    chdir: "/tmp"
+  when: kubectl_check.rc != 0
+
+- name: Make kubectl binary executable
+  ansible.builtin.file:
+    path: "/tmp/kubectl"
+    mode: 'u+x'
+  when: kubectl_check.rc != 0
+
+- name: Ensure $HOME/bin exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/bin"
+    state: directory
+    mode: '0755'
+  when: kubectl_check.rc != 0
+
+- name: Copy kubectl to $HOME/bin and update PATH
+  ansible.builtin.copy:
+    src: "/tmp/kubectl"
+    dest: "{{ ansible_env.HOME }}/bin/kubectl"
+    mode: '0755'
+  when: kubectl_check.rc != 0
+
+- name: Update PATH environment variable
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    line: "export PATH={{ ansible_env.HOME }}/bin:$PATH"
+    create: yes
+    state: present
+  when: kubectl_check.rc != 0
