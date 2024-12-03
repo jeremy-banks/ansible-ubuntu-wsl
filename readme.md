@@ -19,7 +19,8 @@ Playbook to reconfigure Ubuntu WSL on Windows quickly
    ```
 1. Clone this repo and execute playbook
    ```
-   git clone blah blah blah
+   git@github.com:jeremy-banks/ansible-ubuntu-wsl.git
+   cd ansible-ubuntu-wsl
    ansible-playbook site.yml -K
    ```
-1. Begin working
+1. Restart Ubuntu WSL to begin working
