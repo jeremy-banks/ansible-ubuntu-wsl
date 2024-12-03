@@ -4,6 +4,7 @@
     - install-aws-cli
     - install-terraform
     - install-eksctl
+    - install-kubectl
     - repo-folder-symlink
     - git-configuration
     - bash-aliases
