@@ -43,12 +43,6 @@
     mode: '0755'
   when: kubectl_check.rc != 0
 
-# - name: Update PATH environment variable
-#   ansible.builtin.shell: |
-#     echo 'export PATH={{ ansible_env.HOME }}/bin:$PATH' >> {{ ansible_env.HOME }}/.bashrc
-#     source {{ ansible_env.HOME }}/.bashrc
-#   when: kubectl_check.rc != 0
-
 - name: Update PATH environment variable
   lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
