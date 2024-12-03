@@ -1,4 +1,10 @@
 ---
+- name: check if terraform is installed
+  command: terraform -help
+  register: terraform_check
+  changed_when: false
+  failed_when: false
+
 - name: Update apt repository and install required packages
   apt:
     update_cache: yes
@@ -8,6 +14,7 @@
       - curl
     state: present
   become: true
+  when: terraform_check.rc != 0
 
 - name: Install HashiCorp GPG key
   shell: |
@@ -15,6 +22,7 @@
   args:
     creates: /usr/share/keyrings/hashicorp-archive-keyring.gpg
   become: true
+  when: terraform_check.rc != 0
 
 - name: Verify the GPG key fingerprint
   shell: |
@@ -22,6 +30,7 @@
   register: gpg_fingerprint_output
   changed_when: false
   become: true
+  when: terraform_check.rc != 0
 
 - name: Add the official HashiCorp repository
   shell: |
@@ -29,17 +38,21 @@
   args:
     creates: /etc/apt/sources.list.d/hashicorp.list
   become: true
+  when: terraform_check.rc != 0
 
 - name: Update apt repository cache after adding HashiCorp repository
   apt:
     update_cache: yes
   become: true
+  when: terraform_check.rc != 0
 
 - name: Install Terraform
   apt:
     name: terraform
     state: present
   become: true
+  when: terraform_check.rc != 0
 
 - name: Verify Terraform install
   command: terraform -help
+  when: terraform_check.rc != 0

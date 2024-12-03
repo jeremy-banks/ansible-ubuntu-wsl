@@ -3,6 +3,7 @@
   roles:
     - install-aws-cli
     - install-terraform
+    - install-eksctl
     - repo-folder-symlink
     - git-configuration
     - bash-aliases

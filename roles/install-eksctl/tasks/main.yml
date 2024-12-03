@@ -1,0 +1,46 @@
+---
+- name: check if eksctl is installed
+  command: eksctl version
+  register: eksctl_check
+  changed_when: false
+  failed_when: false
+
+- name: Set the architecture and platform
+  set_fact:
+    platform: "{{ ansible_system }}_{{ linux_arch }}"
+  when: eksctl_check.rc != 0
+
+- name: Download eksctl tarball
+  get_url:
+    url: "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_{{ platform }}.tar.gz"
+    dest: "/tmp/eksctl_{{ platform }}.tar.gz"
+    mode: '0644'
+  when: eksctl_check.rc != 0
+
+- name: (Optional) Verify checksum
+  shell: |
+    cd /tmp && curl -sL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_checksums.txt" | grep {{ platform }} | sha256sum --check
+  when: eksctl_check.rc != 0
+
+- name: Extract the eksctl tarball
+  unarchive:
+    src: "/tmp/eksctl_{{ platform }}.tar.gz"
+    dest: "/tmp/"
+    remote_src: yes
+    creates: "/tmp/eksctl"
+  when: eksctl_check.rc != 0
+
+- name: Remove the tarball after extraction
+  file:
+    path: "/tmp/eksctl_{{ platform }}.tar.gz"
+    state: absent
+  when: eksctl_check.rc != 0
+
+- name: Move eksctl binary to /usr/local/bin
+  command: mv /tmp/eksctl /usr/local/bin/eksctl
+  when: eksctl_check.rc != 0
+  become: true
+
+- name: Run eksctl version to verify installation
+  command: eksctl version
+  when: eksctl_check.rc != 0
